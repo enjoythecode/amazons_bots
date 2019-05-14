@@ -1,0 +1,374 @@
+    def search(self, game, depth, max_depth, player_we, player_they):
+        if depth < max_depth:
+    
+            min_max = depth % 2
+
+            next_game = amazons_player()
+
+            if min_max == 0:
+                max_val = -1000
+            elif min_max == 1:
+                min_val = 1000
+
+            for move in game.possible_plays():
+                next_game.set_board(game.get_board(),game.get_turn())
+                next_game.play(move[0], move[1], move[2])
+
+                res = next_game.check_game_end()
+                if res != 0:
+                    x = next_game.value(player_we, player_they)
+                else:
+                    x = game.search(next_game, depth + 1, max_depth, player_we, player_they)
+
+                if min_max == 0 and x > max_val:
+                    max_val = x
+                elif min_max == 1 and x < min_val:
+                    min_val = x
+
+            if min_max == 0:
+                return max_val
+            elif min_max == 1:
+                return min_val
+
+        else:
+            return game.value(player_we, player_they)
+
+
+
+
+
+
+
+
+
+
+import copy
+import math
+import timeit
+
+def prettify_board_character(n):
+    if n == 0:
+        return "."
+    if n == 1:
+        return "W"
+    if n == 2:
+        return "B"
+    if n == 3:
+        return "X"
+
+def coord2index(coord):
+    x = coord[0]
+    if (x=="A"):x=0
+    if (x=="B"):x=1
+    if (x=="C"):x=2
+    if (x=="D"):x=3
+    if (x=="E"):x=4
+    if (x=="F"):x=6
+    y = int(coord[1])-1
+    return [x,y]
+
+def index2coord(index):
+    x = index[1]
+    if x=="0": x="A"
+    if x=="1": x="B"
+    if x=="2": x="C"
+    if x=="3": x="D"
+    if x=="4": x="E"
+    if x=="5": x="F"
+    y = str(int(index[0])+1)
+    return x + y
+
+class amazons_game():
+    meta_name = "Base amazons implementation to be extended by AI"
+    meta_developer = "enjoythecode"
+    meta_description = "Description goes here"
+    board = []
+    turn = 1
+    game_size = None
+    starting_positions = {
+        "10_0": [
+            [0,"03"],[0,"06"],[0,"30"],[0,"29"],
+            [1,"93"],[1,"96"],[1,"60"],[1,"69"]
+        ],
+        "6_0": [
+            [0,"02"],[0,"53"],
+            [1,"30"],[1,"25"]
+        ],
+        "4_0": [
+            [0,"11"],
+            [1,"22"]
+        ],
+        "5_0": [
+            [0,"11"],
+            [1,"33"]
+        ],
+        "2_0": [
+            [0,"00"],
+            [1,"11"]
+        ],
+        "3_0": [
+            [0,"00"],
+            [1,"22"]
+        ]
+    }
+    this_player = -1 # set for bots to distinguish themselves
+
+    def __init__(self, board = []):
+        if not board == []:
+            self.start_game(len(board),-1)
+            self.board = copy.deepcopy(board)
+    
+    def greet(self):
+        print(self.meta_name + " by " + self.meta_developer + ". [" + self.meta_description + "]")
+
+    def get_hash(self):
+        return "-".join([" ".join([str(x) for x in row]) for row in self.board])
+
+    def set_player(self, n):
+        self.this_player = n
+        if n == 1:
+            self.this_opponent = 2
+        else:
+            self.this_opponent = 1
+
+    def print_board(self):
+        for x in self.board:
+            print(" ".join([prettify_board_character(c) for c in x]))
+
+    def get_board(self):
+        return self.board
+
+    def get_turn(self):
+        return self.turn
+    
+    def set_board(self, board, turn):
+        self.board = copy.deepcopy(board)
+        self.game_size = len(board)
+        self.turn = turn
+        self.set_player(turn)
+
+    def start_game(self, size, config):
+        self.game_size = size
+        
+        self.board = []
+        for i in range(size):
+            self.board.append([0]*size)
+
+        if config != -1: #empty board special code
+            for a in self.starting_positions[str(size) + "_" + str(config)]:
+                self.board[int(a[1][0])][int(a[1][1])] = a[0] + 1
+
+    def valid_moves(self, cell_from, ignore = None, include_ignore = False):
+        out = []
+        from_x = int(cell_from[0])
+        from_y = int(cell_from[1])
+        ignore_x = int(ignore[0]) if not ignore is None else -1
+        ignore_y = int(ignore[1]) if not ignore is None else -1
+
+        x, y = from_x, from_y
+        while x+1 < self.game_size:
+            x += 1
+            if self.board[x][y] != 0:
+                if (ignore_x == x and ignore_y == y):
+                    if include_ignore:
+                        out.append(str(x) + str(y))
+                    continue
+                else:
+                    break
+            else:
+                out.append(str(x) + str(y))
+
+        x, y = from_x, from_y
+        while x > 0:
+            x -= 1
+            if self.board[x][y] != 0:
+                if (ignore_x == x and ignore_y == y):
+                    if include_ignore:
+                        out.append(str(x) + str(y))
+                    continue
+                else:
+                    break
+            else:
+                out.append(str(x) + str(y))
+
+        x, y = from_x, from_y
+        while y+1 < self.game_size:
+            y += 1
+            if self.board[x][y] != 0:
+                if (ignore_x == x and ignore_y == y):
+                    if include_ignore:
+                        out.append(str(x) + str(y))
+                    continue
+                else:
+                    break
+            else:
+                out.append(str(x) + str(y))
+
+        x, y = from_x, from_y
+        while y > 0:
+            y -= 1
+            if self.board[x][y] != 0:
+                if (ignore_x == x and ignore_y == y):
+                    if include_ignore:
+                        out.append(str(x) + str(y))
+                    continue
+                else:
+                    break
+            else:
+                out.append(str(x) + str(y))
+
+        x, y = from_x, from_y
+        while x+1 < self.game_size and y+1 < self.game_size:
+            x += 1
+            y += 1
+            if self.board[x][y] != 0:
+                if (ignore_x == x and ignore_y == y):
+                    if include_ignore:
+                        out.append(str(x) + str(y))
+                    continue
+                else:
+                    break
+            else:
+                out.append(str(x) + str(y))
+
+        x, y = from_x, from_y
+        while x+1 < self.game_size and y > 0:
+            x += 1
+            y -= 1
+            if self.board[x][y] != 0:
+                if (ignore_x == x and ignore_y == y):
+                    if include_ignore:
+                        out.append(str(x) + str(y))
+                    continue
+                else:
+                    break
+            else:
+                out.append(str(x) + str(y))
+
+        x, y = from_x, from_y
+        while x > 0 and y+1 < self.game_size:
+            x -= 1
+            y += 1
+            if self.board[x][y] != 0:
+                if (ignore_x == x and ignore_y == y):
+                    if include_ignore:
+                        out.append(str(x) + str(y))
+                    continue
+                else:
+                    break
+            else:
+                out.append(str(x) + str(y))
+
+        x, y = from_x, from_y
+        while x > 0 and y > 0:
+            x -= 1
+            y -= 1
+            if self.board[x][y] != 0:
+                if (ignore_x == x and ignore_y == y):
+                    if include_ignore:
+                        out.append(str(x) + str(y))
+                    continue
+                else:
+                    break
+            else:
+                out.append(str(x) + str(y))
+
+        return out
+
+    def play(self, cell_from, cell_to, cell_shot):
+        self.board[int(cell_from[0])][int(cell_from[1])] = 0
+        self.board[int(cell_to[0])][int(cell_to[1])] = self.turn
+        self.board[int(cell_shot[0])][int(cell_shot[1])] = 3
+        self.turn = 2 if self.turn == 1 else 1
+
+    def possible_shots(self, source, ignore):
+        
+        return self.valid_moves(source, ignore, True)
+
+    def possible_queen_moves(self, side_to_calculate = None):
+        out = []
+
+        #by default, pick the current player
+        if side_to_calculate is None:
+            side_to_calculate = self.turn
+        for q_x in range(self.game_size):
+            for q_y in range(self.game_size):
+                if self.board[q_x][q_y] == side_to_calculate:
+                    q = str(q_x)+str(q_y)
+                    out.extend( [[q, x] for x in self.valid_moves(q)])           
+        return out
+
+    def check_game_end(self):
+        p1 = len(self.possible_queen_moves(1))
+        p2 = len(self.possible_queen_moves(2))
+        if  p1 == 0 and p2 == 0:
+            return 3
+        if p1 == 0:
+            return 2
+        if p2 == 0:
+            return 1
+        return 0
+
+    def possible_moves(self, side_to_calculate = None):
+        out = []
+
+        if side_to_calculate is None:
+            side_to_calculate = self.turn
+
+        queen_moves = self.possible_queen_moves(side_to_calculate)
+        for q in queen_moves:
+            shots = self.possible_shots(q[1],q[0])
+            out.extend([ [q[0],q[1],s] for s in shots ])
+        return out
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class GameState:
+    """ A state of the game, i.e. the game board. These are the only functions which are
+        absolutely necessary to implement UCT in any 2-player complete information deterministic 
+        zero-sum game, although they can be enhanced and made quicker, for example by using a 
+        GetRandomMove() function to generate a random move during rollout.
+        By convention the players are numbered 1 and 2.
+    """
+    def __init__(self):
+            self.playerJustMoved = 2 # At the root pretend the player just moved is player 2 - player 1 has the first move
+        
+    def Clone(self):
+        """ Create a deep clone of this game state.
+        """
+        st = GameState()
+        st.playerJustMoved = self.playerJustMoved
+        return st
+
+    def DoMove(self, move):
+        """ Update a state by carrying out the given move.
+            Must update playerJustMoved.
+        """
+        self.playerJustMoved = 3 - self.playerJustMoved
+        
+    def GetMoves(self):
+        """ Get all possible moves from this state.
+        """
+    
+    def GetResult(self, playerjm):
+        """ Get the game result from the viewpoint of playerjm. 
+        """
+
+    def __repr__(self):
+        """ Don't need this - but good style.
+        """
+        pass
