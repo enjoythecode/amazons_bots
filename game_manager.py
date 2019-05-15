@@ -1,19 +1,19 @@
 import base_amazons_state
-import blocker_v1, human, blocker_v2, blocker_v3, blocker_v4, blocker_v5, blocker_v6, random_bot, mcts_v1
+from bots import blocker_v1, blocker_v3, blocker_v5, blocker_v2, blocker_v4, blocker_v6, mcts_v1, random_bot
 import time
 import itertools
 
 
 bots = [
-        blocker_v1,
-        mcts_v1,
-        # human,
-        blocker_v2,
-        blocker_v3,
-        blocker_v4,
-        blocker_v5,
-        blocker_v6,
-        random_bot,
+    blocker_v1,
+    mcts_v1,
+    # human,
+    blocker_v2,
+    blocker_v3,
+    blocker_v4,
+    blocker_v5,
+    blocker_v6,
+    random_bot,
     ]
 # [12, 21, 15, 15, 27, 12, 24] 6_0
 # [9, 30 (n=2500), 21, 15, 36, 24, 24, 9] 6_0
