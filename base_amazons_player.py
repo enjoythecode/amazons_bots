@@ -8,8 +8,8 @@ class AmazonsPlayer():
 	def greet(self):
 		print(self.meta_name + " by " + self.meta_developer + ". [" + self.meta_description + "]")
 
-	def next_move(self):
+	def next_move(self, board_state):
 		"""
 		Takes in a amazons_state and returns a move object ["AB","CD","EF"]
 		"""
-		raise ImplementationError("Not implemented by the child class!")
+		raise NotImplementedError("Not implemented by the child class!")
