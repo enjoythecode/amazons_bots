@@ -1,28 +1,37 @@
 import base_amazons_player
+import math
 
-MAX_DEPTH = 3
-MIN_VAL = -1e9
+MAX_CALCULATIONS = 10000
 MAX_VAL = 1e9
+MIN_VAL = -1e9
 
 
 class GameNode:
-    def __init__(self, game_state, depth, move=None):
+    def __init__(self, game_state, depth, move=None, max_depth = 2):
         self.state = game_state.clone()
         self.children = []
         self.depth = depth
         self.move = move  # only undefined for root node. root node only functions as a holder of other nodes so it's ok
         self.isLeaf = False
-        if depth < MAX_DEPTH:
+        self.MAX_DEPTH = max_depth
+        if depth == 0:  # only in the root node, calculate MAX_DEPTH
+            self.MAX_DEPTH = math.log(MAX_CALCULATIONS, max(len(self.state.get_possible_moves()), 2)) / 2
+
+        if depth < self.MAX_DEPTH:
             possible_moves = self.state.get_possible_moves()
             if possible_moves:
                 for possible_move in possible_moves:
                     possible_game = self.state.clone()
                     possible_game.make_move(possible_move)
-                    self.children.append(GameNode(possible_game, self.depth + 1, possible_move))
+                    self.children.append(GameNode(possible_game, self.depth + 1, possible_move, self.MAX_DEPTH))
             else:
                 self.isLeaf = True
         else:
             self.isLeaf = True
+
+        if depth == 0:  # only in the root node, calculate MAX_DEPTH
+            self.MAX_DEPTH = math.log(MAX_CALCULATIONS, max(len(self.children), 2))
+            print(self.MAX_DEPTH)
 
 
 class AmazonsPlayer(base_amazons_player.AmazonsPlayer):
