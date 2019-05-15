@@ -1,9 +1,11 @@
 class AmazonsPlayer:
 	
-	def __init__(self):
+	def __init__(self, friend, enemy):
 		self.meta_name = "Base amazons implementation to be extended by AI"
 		self.meta_developer = "Anonymous"
 		self.meta_description = "Description goes here"
+		self.friend = friend
+		self.enemy = enemy
 
 	def greet(self):
 		print(self.meta_name + " by " + self.meta_developer + ". [" + self.meta_description + "]")
