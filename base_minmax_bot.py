@@ -58,9 +58,9 @@ class AmazonsPlayer(base_amazons_player.AmazonsPlayer):
         if res == 0:
             return self.utility(board)
         elif res == 1:
-            return 1e9  # white win
+            return MAX_VAL + 1  # white win
         elif res == 2:
-            return -1e9  # black win
+            return MIN_VAL - 1  # black win
 
     def minimax(self, node, curr_depth, is_maximizing_player, alpha, beta):
         best_move = None
