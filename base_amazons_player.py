@@ -1,4 +1,4 @@
-class AmazonsPlayer():
+class AmazonsPlayer:
 	
 	def __init__(self):
 		self.meta_name = "Base amazons implementation to be extended by AI"
