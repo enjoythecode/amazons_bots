@@ -1,27 +1,14 @@
-import base_amazons_player
+import base_minmax_bot
 
-class AmazonsPlayer(base_amazons_player.AmazonsPlayer):
+
+class AmazonsPlayer(base_minmax_bot.AmazonsPlayer):
     def __init__(self, friend, enemy):
         self.meta_developer = "enjoythecode"
         self.meta_name = "Blocking2Victory (B2V) v2"
-        self.meta_description = "Minimises possible moves of its enemy. Looks 1 move ahead."
+        self.meta_description = "Minimises possible moves of its enemy. Inherits dynamic minimax with ab-pruning."
         self.meta_id = "BTV_0002"
         self.friend = friend
         self.enemy = enemy
 
-    def next_move(self, state):
-        max_val = -1000000
-        max_move = None
-
-        possible_moves = state.get_possible_moves()
-        for move in possible_moves:
-            possible_game = state.clone()
-            possible_game.make_move(move)
-            
-            x = -1 * possible_game.count_possible_moves(self.enemy)
-
-            if x > max_val:
-                max_val = x
-                max_move = move
-
-        return max_move 
+    def utility(self, board):
+        return -1 * board.count_possible_moves(self.enemy)
