@@ -1,5 +1,6 @@
 import base_amazons_player
 
+
 class AmazonsPlayer(base_amazons_player.AmazonsPlayer):
     def __init__(self, friend, enemy):
         self.meta_developer = "enjoythecode"
