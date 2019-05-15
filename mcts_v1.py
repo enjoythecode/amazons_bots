@@ -66,7 +66,7 @@ class game_node():
         return s
 
 
-class amazons_player(base_amazons_player.amazons_player):
+class AmazonsPlayer(base_amazons_player.AmazonsPlayer):
     def __init__(self, friend, enemy):
         self.meta_developer = "enjoythecode"
         self.meta_name = "Monte-Carlo Tree Search (MCTS) v1"

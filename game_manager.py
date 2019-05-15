@@ -74,7 +74,7 @@ class Game:
 
 
 for match_up in itertools.permutations(range(len(bots)), 2):
-    g = Game(bots[match_up[0]].amazons_player(1, 2), bots[match_up[1]].amazons_player(2, 1), 6, 0)
+    g = Game(bots[match_up[0]].AmazonsPlayer(1, 2), bots[match_up[1]].AmazonsPlayer(2, 1), 6, 0)
     res = g.play()
     if res == 1:
         points[match_up[0]] += 3

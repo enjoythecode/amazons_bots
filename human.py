@@ -1,6 +1,6 @@
 import base_amazons_player
 
-class amazons_player(base_amazons_player.amazons_player):
+class AmazonsPlayer(base_amazons_player.AmazonsPlayer):
 
 	def __init__(self, friend, enemy):
 		self.meta_name = "Human-Computer Interface"
