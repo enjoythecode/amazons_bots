@@ -1,23 +1,25 @@
-starting_board_6x0=[
-    [0,0,1,0,0,0],
-    [0,0,0,0,0,0],
-    [0,0,0,0,0,2],
-    [2,0,0,0,0,0],
-    [0,0,0,0,0,0],
-    [0,0,0,1,0,0]
+import copy
+
+starting_board_6x0 = [
+    [0, 0, 1, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 2],
+    [2, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 1, 0, 0]
 ]
 
 starting_board_4x0 = [
-    [0,1,0,0],
-    [0,0,0,0],
-    [0,0,0,0],
-    [0,0,2,0]
+    [0, 1, 0, 0],
+    [0, 0, 0, 0],
+    [0, 0, 0, 0],
+    [0, 0, 2, 0]
 ]
 
-import copy
 
 def prettify_board_character(n):
     return ".WBX"[n]
+
 
 class AmazonsState:
     """ A state of the game, i.e. the game board. These are the only functions which are
@@ -27,8 +29,8 @@ class AmazonsState:
         By convention the players are numbered 1 and 2.
         Assumes square game board
     """
-    def __init__(self, board, pjm = 2):
-        self.playerJustMoved = pjm # At the root pretend the player just moved is player 2 - player 1 has the first move
+    def __init__(self, board, pjm=2):
+        self.playerJustMoved = pjm  # At the root pretend the player just moved is player 2 - player 1 moves first
         self.board = copy.deepcopy(board)
         self.game_size = len(board)
 
@@ -46,9 +48,8 @@ class AmazonsState:
         self.board[int(move[0][0])][int(move[0][1])] = 0
         self.board[int(move[1][0])][int(move[1][1])] = self.playerJustMoved
         self.board[int(move[2][0])][int(move[2][1])] = 3
-        
-    
-    def count_possible_moves(self, player = None):
+
+    def count_possible_moves(self, player=None):
         """ Get # of possible moves from this state.
         """
         out = 0
@@ -62,8 +63,7 @@ class AmazonsState:
 
         return out
 
-
-    def get_possible_moves(self, player = None):
+    def get_possible_moves(self, player=None):
         """ Get all possible moves from this state.
         """
         out = []
@@ -75,7 +75,7 @@ class AmazonsState:
             out.extend([ [q[0],q[1],s] for s in self.get_possible_shots_from_queen(q[1],q[0]) ])
         return out
 
-    def get_possible_queen_moves(self, player = None):
+    def get_possible_queen_moves(self, player=None):
         out = []
         if player is None:
             player = 3 - self.playerJustMoved
@@ -87,7 +87,7 @@ class AmazonsState:
 
         return out
 
-    def count_possible_queen_moves(self, player = None):
+    def count_possible_queen_moves(self, player=None):
         if player is None:
             player = 3 - self.playerJustMoved
         out = 0
@@ -106,7 +106,7 @@ class AmazonsState:
     def count_possible_shots_from_queen(self, source, ignore):
         return self.count_valid_moves(source, ignore, True)
 
-    def get_valid_moves(self, cell_from, ignore = None, include_ignore = False):
+    def get_valid_moves(self, cell_from, ignore=None, include_ignore=False):
         out = []
         from_x = int(cell_from[0])
         from_y = int(cell_from[1])
@@ -117,7 +117,7 @@ class AmazonsState:
         while x+1 < self.game_size:
             x += 1
             if self.board[x][y] != 0:
-                if (ignore_x == x and ignore_y == y):
+                if ignore_x == x and ignore_y == y:
                     if include_ignore:
                         out.append(str(x) + str(y))
                     continue
@@ -130,7 +130,7 @@ class AmazonsState:
         while x > 0:
             x -= 1
             if self.board[x][y] != 0:
-                if (ignore_x == x and ignore_y == y):
+                if ignore_x == x and ignore_y == y:
                     if include_ignore:
                         out.append(str(x) + str(y))
                     continue
@@ -223,18 +223,18 @@ class AmazonsState:
 
         return out
 
-    def count_valid_moves(self, cell_from, ignore = None, include_ignore = False):
+    def count_valid_moves(self, cell_from, ignore=None, include_ignore=False):
         out = 0
         from_x = int(cell_from[0])
         from_y = int(cell_from[1])
-        ignore_x = int(ignore[0]) if not ignore is None else -1
-        ignore_y = int(ignore[1]) if not ignore is None else -1
+        ignore_x = int(ignore[0]) if ignore is not None else -1
+        ignore_y = int(ignore[1]) if ignore is not None else -1
 
         x, y = from_x, from_y
         while x+1 < self.game_size:
             x += 1
             if self.board[x][y] != 0:
-                if (ignore_x == x and ignore_y == y):
+                if ignore_x == x and ignore_y == y:
                     if include_ignore:
                         out += 1
                     continue
@@ -247,7 +247,7 @@ class AmazonsState:
         while x > 0:
             x -= 1
             if self.board[x][y] != 0:
-                if (ignore_x == x and ignore_y == y):
+                if ignore_x == x and ignore_y == y:
                     if include_ignore:
                         out += 1
                     continue
@@ -260,7 +260,7 @@ class AmazonsState:
         while y+1 < self.game_size:
             y += 1
             if self.board[x][y] != 0:
-                if (ignore_x == x and ignore_y == y):
+                if ignore_x == x and ignore_y == y:
                     if include_ignore:
                         out += 1
                     continue
@@ -273,7 +273,7 @@ class AmazonsState:
         while y > 0:
             y -= 1
             if self.board[x][y] != 0:
-                if (ignore_x == x and ignore_y == y):
+                if ignore_x == x and ignore_y == y:
                     if include_ignore:
                         out += 1
                     continue
@@ -287,7 +287,7 @@ class AmazonsState:
             x += 1
             y += 1
             if self.board[x][y] != 0:
-                if (ignore_x == x and ignore_y == y):
+                if ignore_x == x and ignore_y == y:
                     if include_ignore:
                         out += 1
                     continue
@@ -301,7 +301,7 @@ class AmazonsState:
             x += 1
             y -= 1
             if self.board[x][y] != 0:
-                if (ignore_x == x and ignore_y == y):
+                if ignore_x == x and ignore_y == y:
                     if include_ignore:
                         out += 1
                     continue
@@ -315,7 +315,7 @@ class AmazonsState:
             x -= 1
             y += 1
             if self.board[x][y] != 0:
-                if (ignore_x == x and ignore_y == y):
+                if ignore_x == x and ignore_y == y:
                     if include_ignore:
                         out += 1
                     continue
@@ -329,7 +329,7 @@ class AmazonsState:
             x -= 1
             y -= 1
             if self.board[x][y] != 0:
-                if (ignore_x == x and ignore_y == y):
+                if ignore_x == x and ignore_y == y:
                     if include_ignore:
                         out += 1
                     continue
@@ -340,8 +340,6 @@ class AmazonsState:
 
         return out
 
-
-
     def is_game_going_on(self):
         return bool(self.count_possible_queen_moves())
 
@@ -351,12 +349,11 @@ class AmazonsState:
         if p1 == 0 and p2 == 0:
             return self.playerJustMoved # player who just moved wins
         elif p1 == 0:
-            return 2 # player 2 won
+            return 2  # player 2 won
         elif p2 == 0:
-            return 1 # player 1 won
+            return 1  # player 1 won
         else:
-            return 0 # game going on
-
+            return 0  # game going on
 
     def __repr__(self):
         """ Don't need this - but good style.
