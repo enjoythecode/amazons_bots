@@ -34,6 +34,7 @@ class AmazonsState:
         self.playerJustMoved = pjm  # At the root pretend the player just moved is player 2 - player 1 moves first
         self.board = copy.deepcopy(board)
         self.game_size = len(board)
+        self.number_of_turns = 0  # used to track the total number of shots which is used to calculate points in the end
 
     def clone(self):
         """ Create a deep clone of this game state.
@@ -49,6 +50,8 @@ class AmazonsState:
         self.board[int(move[0][0])][int(move[0][1])] = 0
         self.board[int(move[1][0])][int(move[1][1])] = self.playerJustMoved
         self.board[int(move[2][0])][int(move[2][1])] = 3
+
+        self.number_of_turns += 1
 
     def count_possible_moves(self, player=None):
         """ Get # of possible moves from this state.
