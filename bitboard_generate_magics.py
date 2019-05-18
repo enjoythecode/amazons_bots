@@ -1,4 +1,3 @@
-from bitarray import bitarray as ba
 from itertools import combinations
 import math
 from random import randint
@@ -27,17 +26,20 @@ magic_shifts = []
 # 300..399 anti-diagonal
 move_boards = []
 
+# arbitrary number of shifts, OK as long as it is consistent
+HASH_SHIFTS = 10
+
 
 def r(b):
-    return "\n".join([" ".join(b[i * 10:(i + 1) * 10]) for i in range(10)][::-1])
+    return "\n".join([" ".join(bin(b)[2:][::-1][i * 10:(i + 1) * 10]) for i in range(10)][::-1])
 
 
 def magic_hash(bb, magic, shift):
-    return ba((int(bb.to01(), 2) * magic) >> shift)
+    return ((bb * magic) & ((2**shift - 1) << HASH_SHIFTS)) >> HASH_SHIFTS
 
 
 def moveboard_from_blockboard(bb, d):
-    raise NotImplemented("not the way this is supposed to be used")
+    raise NotImplemented("not the way this is error supposed to be used")
 
 
 def generate_block_masks():
@@ -46,33 +48,33 @@ def generate_block_masks():
         s_x = square % 10
         s_y = math.floor(square / 10)
 
-        b = ba('0'*100)
+        b = 0
         for x in range(10):
             if not x == s_x:
-                b[s_y*10 + x] = True
+                b += 2 ** (s_y * 10 + x)
         block_masks[square] = b
 
-        b = ba('0'*100)
+        b = 0
         for y in range(10):
             if not y == s_y:
-                b[y*10 + s_x] = True
+                b += 2 ** (y*10 + s_x)
         block_masks[100 + square] = b
 
-        b = ba('0'*100)
+        b = 0
         for x in range(10):
             for y in range(10):
                 if not y == s_y and not x == s_x:
                     if x+y == s_x + s_y:
-                        b[y*10 + x] = True
+                        b += 2 ** (y*10 + x)
         block_masks[200 + square] = b
 
-        b = ba('0' * 100)
+        b = 0
         for x in range(10):
             for y in range(10):
                 if not y == s_y and not x == s_x:
                     if x - y == s_x - s_y:
-                        b[y * 10 + x] = True
-        block_masks[300 +square] = b
+                        b += 2 ** (y * 10 + x)
+        block_masks[300 + square] = b
 
 
 def generate_magic_numbers_and_move_boards():
