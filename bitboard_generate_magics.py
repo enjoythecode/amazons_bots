@@ -91,21 +91,26 @@ def generate_magic_numbers_and_move_boards():
             temp_block_boards = []
             #  find indexes of 1s, get the combinations of those indexes and record them to temp_block_boards
             bit_indexes = []
-            block_mask_string = block_masks[100*direction + square].to01()
-            for i in range(100):
-                if block_mask_string[i] == '1':
+            block_mask = block_masks[100*direction + square]
+            i = 0
+            while block_mask:
+                if block_mask & 1:
                     bit_indexes.append(i)
+                i += 1
+                block_mask >>= 1
 
             bit_index_combinations = []
             for length in range(10):
                 bit_index_combinations.extend(combinations(bit_indexes, length))
 
             for bit_index_combination in bit_index_combinations:
-                new_block_board = ba('0'*100)
+                new_block_board = 0
                 for turn_on in bit_index_combination:
-                    new_block_board[turn_on] = True
+                    new_block_board += 2 ** (turn_on)
                 temp_block_boards.append(new_block_board)
 
+
+            ######### LEFT EHRERHEHRHER1! ##############
             # generate move_boards from these temp_block_boards
 
             shift_bits = 100 - math.log(len(temp_block_boards), 2)
