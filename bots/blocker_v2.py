@@ -1,7 +1,7 @@
-import base_minmax_bot
+from . import base_minmax_bot
 
 
-class AmazonsPlayer(base_minmax_bot.AmazonsPlayer):
+class AmazonsPlayer(base_minmax_bot.BaseMinmaxBot):
     def __init__(self, friend, enemy):
         self.meta_developer = "enjoythecode"
         self.meta_name = "Blocking2Victory (B2V) v2"

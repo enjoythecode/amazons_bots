@@ -1,4 +1,4 @@
-class AmazonsPlayer:
+class AmazonsAgent:
 	'''
 		Defines the common methods of all Amazons agents.
 		All Amazons agents should extend this class.

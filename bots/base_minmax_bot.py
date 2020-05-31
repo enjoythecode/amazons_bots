@@ -1,4 +1,4 @@
-import base_amazons_player
+import amazons_agent
 import math
 
 MAX_CALCULATIONS = 10000
@@ -34,7 +34,7 @@ class GameNode:
             print(self.MAX_DEPTH)
 
 
-class AmazonsPlayer(base_amazons_player.AmazonsPlayer):
+class BaseMinmaxBot(amazons_agent.AmazonsAgent):
 
     def __init__(self, friend, enemy):
         self.meta_name = "Base minmax implementation to be extended by other bots"

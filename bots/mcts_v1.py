@@ -3,7 +3,7 @@
 from math import *
 import random
 
-import base_amazons_player
+import amazons_agent
 
 MAX_ITERATIONS = 2500
 
@@ -69,7 +69,7 @@ class GameNode:
         return s
 
 
-class AmazonsPlayer(base_amazons_player.AmazonsPlayer):
+class AmazonsPlayer(amazons_agent.AmazonsAgent):
     def __init__(self, friend, enemy):
         self.meta_developer = "enjoythecode"
         self.meta_name = "Monte-Carlo Tree Search (MCTS) v1"
