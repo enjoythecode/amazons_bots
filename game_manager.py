@@ -1,5 +1,5 @@
-import base_amazons_state
-from bots import blocker_v1, blocker_v3, blocker_v5, blocker_v2, blocker_v4, blocker_v6, mcts_v1, random_bot
+import amazons_state
+from bots import base_minmax_bot, blocker_v1, blocker_v3, blocker_v5, blocker_v2, blocker_v4, blocker_v6, mcts_v1, random_bot
 import time
 import itertools
 
@@ -13,10 +13,14 @@ bots = [
     blocker_v4,
     blocker_v5,
     blocker_v6,
-    random_bot,
+    # random_bot
     ]
-# [12, 21, 15, 15, 27, 12, 24] 6_0
-# [9, 30 (n=2500), 21, 15, 36, 24, 24, 9] 6_0
+
+# 5/31 Tournament with the latest bots
+# [15, 18, 3, 21, 21, 15, 33]
+# 1st place: Blocker v6
+# 2nd place: Blocker v3 & Blocker v4 (tied)
+
 points = [0] * len(bots)
 
 
@@ -44,11 +48,11 @@ class Game:
         starting_board = None
 
         if game_size == 6 and game_config == 0:
-            starting_board = base_amazons_state.starting_board_6x0
+            starting_board = amazons_state.starting_board_6x0
         elif game_size == 4 and game_config == 0:
-            starting_board = base_amazons_state.starting_board_4x0
+            starting_board = amazons_state.starting_board_4x0
 
-        self.base_state = base_amazons_state.AmazonsState(starting_board)
+        self.base_state = amazons_state.AmazonsState(starting_board)
         
         self.players[0].greet()
         self.players[1].greet()
