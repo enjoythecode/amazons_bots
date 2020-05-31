@@ -18,16 +18,16 @@ starting_board_4x0 = [
 
 
 def prettify_board_character(n):
+    '''Convenience method that turns the board representation of different board entities to their representations
+    '''
     return ".WBX"[n]
 
 
 class AmazonsState:
-    """ A state of the game, i.e. the game board. These are the only functions which are
-        absolutely necessary to implement UCT in any 2-player complete information deterministic 
-        zero-sum game, although they can be enhanced and made quicker, for example by using a 
-        GetRandomMove() function to generate a random move during rollout.
-        By convention the players are numbered 1 and 2.
-        Assumes square game board
+    """ 
+    Holds the state of the Game of Amazons (board etc.).
+    Players are numbered 1 and 2.
+    Assumes a square board.
     """
 
     def __init__(self, board, pjm=2):
@@ -68,7 +68,16 @@ class AmazonsState:
         return out
 
     def get_possible_moves(self, player=None):
-        """ Get all possible moves from this state.
+        """
+        Returns a list of all possible moves from this state.
+        ---
+        Arguments:
+            player: [1, 2]. The player to get the theoric possible moves from. Does not take into account turns.
+                Defaults to player with the turn.
+        ---
+        Returns:
+            out: list of possible moves of the given player.
+        
         """
         out = []
         if player is None:
@@ -228,6 +237,12 @@ class AmazonsState:
         return out
 
     def count_valid_moves(self, cell_from, ignore=None, include_ignore=False):
+        '''
+            Different from len(get_valid_moves) because natively counting is marginally faster than
+            adding all the possible moves to a list and counting it. 
+            
+            This method will be deprecated after the implementation of bitboard move calculation.
+        '''
         out = 0
         from_x = int(cell_from[0])
         from_y = int(cell_from[1])
@@ -352,15 +367,15 @@ class AmazonsState:
         p2 = self.count_possible_queen_moves(2)
         if p1 == 0 and p2 == 0:
             return self.playerJustMoved  # player who just moved wins
-        elif p1 == 0:
-            return 2  # player 2 won
-        elif p2 == 0:
-            return 1  # player 1 won
-        else:
-            return 0  # game going on
+        elif p1 == 0: # player 2 won
+            return 2
+        elif p2 == 0: # player 1 won
+            return 1
+        else:  # game going on
+            return 0
 
     def __repr__(self):
-        """ Don't need this - but good style.
+        """ Returns a string representation of the board.
         """
         return "\n".join(
             [" ".join([prettify_board_character(c) for c in x]) for x in self.board]
