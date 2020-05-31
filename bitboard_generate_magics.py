@@ -1,33 +1,34 @@
 from itertools import combinations
 import math
 from random import randint
+import copy
 
 # to be used to generate block boards from actual game positions
 # 0..99 horizontal
 # 100..199 vertical
 # 200..299 diagonal
 # 300..399 anti-diagonal
-block_masks = [0] * 400
+block_masks = [None] * 400
 
 # integers that are multiplied with block boards to find the correct index of the move boards. one for each square
 # 0..99 horizontal
 # 100..199 vertical
 # 200..299 diagonal
 # 300..399 anti-diagonal
-magic_numbers = []
+magic_numbers = [None] * 400
 
 # the amount of shifts required for the hashing for any particular square/direction combination. also determines size
-magic_shifts = []
+magic_shifts = [None] * 400
 
 # the resulting move boards. to be accessed using the magic number calculation only [direction + square][magic hash]
 # 0..99 horizontal
 # 100..199 vertical
 # 200..299 diagonal
 # 300..399 anti-diagonal
-move_boards = []
+move_boards = [None] * 400
 
 # arbitrary number of shifts, OK as long as it is consistent
-HASH_SHIFTS = 10
+HASH_SHIFTS = 30
 
 
 def r(b):
@@ -35,11 +36,75 @@ def r(b):
 
 
 def magic_hash(bb, magic, shift):
-    return ((bb * magic) & ((2**shift - 1) << HASH_SHIFTS)) >> HASH_SHIFTS
+    x = ((bb * magic) & ((2**shift - 1) << HASH_SHIFTS)) >> HASH_SHIFTS
+    #if shift < 4:
+    #    print(bb, bin(bb*magic),bin(x), magic, bb, shift)
+    return x
+# 0111001110000010100101101111001110111000000001111011000000000000
 
+def moveboard_from_blockboard(bb, square, d):
+    # not fully implemented yet!
+    s_x = square % 10
+    s_y = int((square - s_x) / 10)
+    mb = 0
+    if d == 0:  # horizontal
+        mb = 0
+        # check left
+        for d_x in range(1, s_x+1):
+            if bb & (1 << ((s_x - d_x) + s_y * 10)):  # obstacle!
+                break
+            mb += 2**((s_x - d_x) + s_y * 10)
 
-def moveboard_from_blockboard(bb, d):
-    raise NotImplemented("not the way this is error supposed to be used")
+        # check right
+        for d_x in range(1, 10-s_x):
+            if bb & (1 << ((s_x + d_x) + s_y * 10)):  # obstacle!
+                break
+            mb += 2**((s_x + d_x) + s_y * 10)
+
+    if d == 1:  # vertical
+
+        # check down
+        for d_y in range(1, s_y+1):
+            if bb & (1 << (s_x + (s_y - d_y) * 10)):  # obstacle!
+                break
+            mb += 2**(s_x + (s_y - d_y) * 10)
+
+        # check up
+        for d_y in range(1, 10-s_y):
+            if bb & (1 << (s_x + (s_y + d_y) * 10)):  # obstacle!
+                break
+            mb += 2**(s_x + (s_y + d_y) * 10)
+
+    if d == 2:  # diagonal
+
+        # check SW
+        for d in range(1, min(s_x, s_y)+1):
+            if bb & (1 << (s_x - d + (s_y - d) * 10)):  # obstacle!
+                break
+            mb += 2**(s_x - d + (s_y - d) * 10)
+
+        # check NE
+        for d in range(1, 10-max(s_x, s_y)):
+            if bb & (1 << (s_x + d + (s_y + d) * 10)):  # obstacle!
+                break
+            mb += 2**(s_x + d + (s_y + d) * 10)
+
+    if d == 3:  # anti-diagonal
+
+        # check SE
+        for d in range(1, min(s_x, s_y) + 1):
+            if bb & (1 << (s_x + d + (s_y - d) * 10)):  # obstacle!
+                break
+            mb += 2 ** (s_x + d + (s_y - d) * 10)
+
+        # check NE
+        for d in range(1, 10 - max(s_x, s_y)):
+            if bb & (1 << (s_x - d + (s_y + d) * 10)):  # obstacle!
+                break
+            mb += 2 ** (s_x - d + (s_y + d) * 10)
+
+    if mb != 0:
+        return mb
 
 
 def generate_block_masks():
@@ -86,6 +151,7 @@ def generate_magic_numbers_and_move_boards():
     for direction in range(4):
 
         for square in range(100):
+            print(direction, square)
             # generate all possible block boards from a block mask
 
             temp_block_boards = []
@@ -109,33 +175,51 @@ def generate_magic_numbers_and_move_boards():
                     new_block_board += 2 ** (turn_on)
                 temp_block_boards.append(new_block_board)
 
-
-            ######### LEFT EHRERHEHRHER1! ##############
             # generate move_boards from these temp_block_boards
 
-            shift_bits = 100 - math.log(len(temp_block_boards), 2)
+            temp_shift_bits = int(math.log(len(temp_block_boards), 2))
             repeat = True
-            temp_magic = 0  # initialized in the loop
+            temp_magic = 0
+            temp_move_boards = [None] * len(temp_block_boards)
 
             while repeat:  # keep searching until we find a good number that satisfies all constraints
-                temp_magic = randint(1000,1000000)
+                temp_magic = randint(2**randint(60,65), 2**randint(65, 70))
                 temp_move_boards = [None] * len(temp_block_boards)
                 repeat = False
 
                 for temp_block_board in temp_block_boards:
-                    h = magic_hash(temp_block_board, temp_magic, shift_bits)
+                    temp_hash = magic_hash(temp_block_board, temp_magic, temp_shift_bits)
 
-                    # hash to find index
+                    temp_move_board = moveboard_from_blockboard(temp_block_board, square, direction)
+
                     # if index is free, put the moveboard there
-                    # if the index is not free AND (the moveboard at the index != current moveboard):
-                    #  repeat = True; continue;
+                    if temp_move_boards[temp_hash] is None:
+                        temp_move_boards[temp_hash] = temp_move_board
+                    else:
+                        if temp_move_boards[temp_hash] == temp_move_board:
+                            # temp_magic is NOT magic!
+                            repeat = True
+                            # print(temp_hash)
+                            break
+
+            # we are done! save the computed values
+            magic_numbers[direction * 100 + square] = temp_magic
+            magic_shifts[direction * 100 + square] = temp_shift_bits
+            move_boards[direction * 100 + square] = copy.deepcopy(temp_move_boards)
 
 
 if __name__ == "__main__":
+    # Generating move boards and magic numbers
+    print("a")
     generate_block_masks()
+    print("b")
     generate_magic_numbers_and_move_boards()
-    # generate block boards
-    # get the indexes of all 1's in a block mask, iterate through all permutations using itertools
-    # re-check how this stuff is supposed to be done
-    # calculate magic numbers
-    # store the magic numbers
+    print("c")
+    b = 2**6 + 2**30 + 2**39 + 2**60 + 2**69 + 2**93 + 2**96
+    print(move_boards[3][magic_hash(b, magic_numbers[3], magic_shifts[3])] |
+          move_boards[103][magic_hash(b, magic_numbers[103], magic_shifts[103])] |
+          move_boards[203][magic_hash(b, magic_numbers[203], magic_shifts[203])] |
+          move_boards[303][magic_hash(b, magic_numbers[303], magic_shifts[303])]
+          )
+
+    # Done generating move boards and magic numbers
