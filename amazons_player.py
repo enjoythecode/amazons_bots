@@ -1,4 +1,8 @@
 class AmazonsPlayer:
+	'''
+		Defines the common methods of all Amazons agents.
+		All Amazons agents should extend this class.
+	'''
 	
 	def __init__(self, friend, enemy):
 		self.meta_name = "Base amazons implementation to be extended by AI"
@@ -14,4 +18,4 @@ class AmazonsPlayer:
 		"""
 		Takes in a amazons_state and returns a move object ["AB","CD","EF"]
 		"""
-		raise NotImplementedError("Not implemented by the child class!")
+		raise NotImplementedError("Not implemented!")
