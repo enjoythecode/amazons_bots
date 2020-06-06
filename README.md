@@ -11,11 +11,4 @@ Collection of AI models that play the Game of the Amazons.
 
 ## Contributing
 All PRs, bug reports, ideas etc. are welcome.
-
-### To-dos
-
-[ ] Track this list on GitHub issues
-[ ] Move the repository to public
-[ ] Improve documentation
-[ ] Implement more agents
-[ ] Implement bitboard move generation
+Open an issue to report a bug or to ask a question
